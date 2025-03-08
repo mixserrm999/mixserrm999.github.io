@@ -15,57 +15,74 @@
         <p>This is my first GitHub Pages website.</p>
 
         <h2>Assembly Code:</h2>
-        <pre><code class="assembly-code">
+        <textarea id="assembly-input" class="assembly-input" placeholder="Enter your assembly code here...">
 inc   rax;
 call  0x10040;
 mov   rax, qword ptr[rdx + 4];
 sub   esp, 0x100;
 pop   rbx;
-        </code></pre>
+        </textarea>
 
         <h2>Machine Code:</h2>
         <pre><code id="machine-code" class="machine-code"></code></pre>
     </div>
 
     <script>
-        // Input: Assembly
-        var assembly = `
-          inc   rax;
-          call  0x10040;
-          mov   rax, qword ptr[rdx + 4];
-          sub   esp, 0x100;
-          pop   rbx;
-        `;
+        // Function to assemble assembly code
+        function assembleCode(assembly) {
+            try {
+                // Initialize the encoder
+                var a = new ks.Keystone(ks.ARCH_X86, ks.MODE_64);
 
-        try {
-            // Initialize the encoder
-            var a = new ks.Keystone(ks.ARCH_X86, ks.MODE_64);
+                // Choose preferred syntax
+                a.option(ks.OPT_SYNTAX, ks.OPT_SYNTAX_INTEL);
 
-            // Choose preferred syntax
-            a.option(ks.OPT_SYNTAX, ks.OPT_SYNTAX_INTEL);
+                // Assemble instructions
+                var result = a.asm(assembly);
 
-            // Assemble instructions
-            var result = a.asm(assembly);
+                // Check if assembly succeeded
+                if (result.failed) {
+                    console.error("Assembly failed:", result.error);
+                    document.getElementById("machine-code").textContent = "Assembly failed: " + result.error;
+                } else {
+                    console.log("Assembly succeeded!");
+                    console.log("Number of instructions:", result.count);
+                    console.log("Machine code:", result.mc);
 
-            // Check if assembly succeeded
-            if (result.failed) {
-                console.error("Assembly failed:", result.error);
-                document.getElementById("machine-code").textContent = "Assembly failed: " + result.error;
-            } else {
-                console.log("Assembly succeeded!");
-                console.log("Number of instructions:", result.count);
-                console.log("Machine code:", result.mc);
+                    // Display machine code on the webpage
+                    var machineCodeHex = Array.from(result.mc).map(b => b.toString(16).padStart(2, '0')).join(' ');
+                    document.getElementById("machine-code").textContent = machineCodeHex;
+                }
 
-                // Display machine code on the webpage
-                var machineCodeHex = Array.from(result.mc).map(b => b.toString(16).padStart(2, '0')).join(' ');
-                document.getElementById("machine-code").textContent = machineCodeHex;
+                // Close encoder
+                a.close();
+            } catch (error) {
+                console.error("An error occurred:", error);
+                document.getElementById("machine-code").textContent = "An error occurred: " + error;
             }
+        }
 
-            // Close encoder
-            a.close();
-        } catch (error) {
-            console.error("An error occurred:", error);
-            document.getElementById("machine-code").textContent = "An error occurred: " + error;
+        // Get the textarea element
+        var assemblyInput = document.getElementById("assembly-input");
+
+        // Assemble code when the user types
+        assemblyInput.addEventListener("input", function () {
+            var assembly = assemblyInput.value;
+            assembleCode(assembly);
+        });
+
+        // Assemble the initial code
+        assembleCode(assemblyInput.value);
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then((registration) => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch((error) => {
+                    console.error('Service Worker registration failed:', error);
+                });
         }
     </script>
 </body>
