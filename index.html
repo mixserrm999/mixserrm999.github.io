@@ -39,9 +39,6 @@ bx lr;
                 // Initialize the encoder for ARM32
                 var a = new ks.Keystone(ks.ARCH_ARM, ks.MODE_ARM);
 
-                // Choose preferred syntax (ARM uses ARM syntax by default)
-                a.option(ks.OPT_SYNTAX, ks.OPT_SYNTAX_INTEL);
-
                 // Assemble instructions
                 var result = a.asm(assembly);
 
