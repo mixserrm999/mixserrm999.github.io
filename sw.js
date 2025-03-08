@@ -4,8 +4,8 @@ const ASSETS = [
   '/index.html',
   '/styles.css',
   '/keystone.min.js',
-  '/icon-192x192.png',
-  '/icon-512x512.png'
+  '/apple-touch-icon.png',
+  '/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', (event) => {
