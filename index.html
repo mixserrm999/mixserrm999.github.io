@@ -16,11 +16,9 @@
 
         <h2>Assembly Code:</h2>
         <textarea id="assembly-input" class="assembly-input" placeholder="Enter your assembly code here...">
-inc   rax;
-call  0x10040;
-mov   rax, qword ptr[rdx + 4];
-sub   esp, 0x100;
-pop   rbx;
+mov r0, #0x3F8;
+add r1, r2, r3;
+bx lr;
         </textarea>
 
         <h2>Machine Code:</h2>
@@ -28,13 +26,20 @@ pop   rbx;
     </div>
 
     <script>
+        // Check if Keystone Engine is loaded
+        if (typeof ks !== 'undefined') {
+            console.log("Keystone Engine loaded successfully!");
+        } else {
+            console.error("Keystone Engine failed to load!");
+        }
+
         // Function to assemble assembly code
         function assembleCode(assembly) {
             try {
-                // Initialize the encoder
-                var a = new ks.Keystone(ks.ARCH_X86, ks.MODE_64);
+                // Initialize the encoder for ARM32
+                var a = new ks.Keystone(ks.ARCH_ARM, ks.MODE_ARM);
 
-                // Choose preferred syntax
+                // Choose preferred syntax (ARM uses ARM syntax by default)
                 a.option(ks.OPT_SYNTAX, ks.OPT_SYNTAX_INTEL);
 
                 // Assemble instructions
@@ -68,6 +73,7 @@ pop   rbx;
         // Assemble code when the user types
         assemblyInput.addEventListener("input", function () {
             var assembly = assemblyInput.value;
+            console.log("Assembly code:", assembly); // Debug: Log the assembly code
             assembleCode(assembly);
         });
 
